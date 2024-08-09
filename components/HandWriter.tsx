@@ -1,46 +1,67 @@
-import * as fabric from 'fabric'
-import React, { useEffect, useRef } from 'react'
+import * as fabric from 'fabric';
+import React, { useEffect, useRef } from 'react';
 
 export const HandWriter: React.FC<{
-  width?: number
-  height?: number
-  brushColor?: string
-  brushWidth?: number
-  resTime?: number
-  handler?: (base64: string) => void
+  width?: number;
+  height?: number;
+  brushColor?: string;
+  brushWidth?: number;
+  resTime?: number;
+  handler?: (trace: number[][][]) => void;
 }> = ({
   width,
   height,
   brushColor,
   brushWidth,
   resTime,
-  handler
+  handler,
 }) => {
-  const canvasRef = useRef<HTMLCanvasElement>(null)
-  const fabricCanvasRef = useRef<fabric.Canvas | null>(null)
-  const timer = useRef<NodeJS.Timeout>()
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const fabricCanvasRef = useRef<fabric.Canvas | null>(null);
+  const timer = useRef<NodeJS.Timeout>();
 
   useEffect(() => {
-    if (!canvasRef.current) return
+    if (!canvasRef.current) return;
 
-    const canvas = new fabric.Canvas(canvasRef.current)
-    fabricCanvasRef.current = canvas
+    const canvas = new fabric.Canvas(canvasRef.current);
+    fabricCanvasRef.current = canvas;
 
-    // fabric包裹了一层div，所以是parent的parent
-    const parent = canvasRef.current.parentElement?.parentElement 
-    const currWidth = width || parent?.clientWidth
-    const currHeight = height || parent?.clientHeight
+    const parent = canvasRef.current.parentElement?.parentElement;
+    const currWidth = width || parent?.clientWidth;
+    const currHeight = height || parent?.clientHeight;
 
     canvas.setDimensions({
       width: currWidth,
-      height: currHeight
-    })
+      height: currHeight,
+    });
 
-    canvas.isDrawingMode = true
-    const pencilBrush = new fabric.PencilBrush(canvas)
-    pencilBrush.color = brushColor || 'black'
-    pencilBrush.width = brushWidth || 10
-    canvas.freeDrawingBrush = pencilBrush
+    canvas.isDrawingMode = true;
+    const pencilBrush = new fabric.PencilBrush(canvas);
+    pencilBrush.color = brushColor || 'black';
+    pencilBrush.width = brushWidth || 10;
+    canvas.freeDrawingBrush = pencilBrush;
+
+    let trace: number[][][] = [];
+
+    canvas.on('path:created', (event) => {
+      const path = event.path as fabric.Path; 
+      const pathData = path.path;
+
+      const xCoords: number[] = [];
+      const yCoords: number[] = [];
+
+      pathData.forEach((item) => {
+        if (item.length >= 3) {
+          const [cmd, x, y] = item as [string, number, number];
+          if (cmd === 'M' || cmd === 'L') {
+            xCoords.push(x);
+            yCoords.push(y);
+          }
+        }
+      });
+
+      trace.push([xCoords, yCoords]);
+    });
 
     canvas.on('mouse:down', () => {
       clearTimeout(timer.current)
@@ -48,18 +69,25 @@ export const HandWriter: React.FC<{
 
     canvas.on('mouse:up', () => {
       timer.current = setTimeout(() => {
-        handler ? handler(canvas.toDataURL()) : console.log('on mouse up', canvas.toDataURL())
-        canvas.clear()
-      }, resTime || 500)
-    })
+        
+        handler ? 
+        (() => {
+          handler(trace)
+          trace = []
+        })() 
+        :
+        console.log('Trace:', trace);
+
+        canvas.clear();
+      }, resTime || 500);
+    });
 
     return () => {
-      // 在组件卸载时销毁 fabric.Canvas 实例
-      fabricCanvasRef.current?.dispose()
-    }
-  }, [width, height, brushColor, brushWidth, resTime, handler])
+      fabricCanvasRef.current?.dispose();
+    };
+  }, [width, height, brushColor, brushWidth, resTime, handler]);
 
-  return <canvas ref={canvasRef} />
+  return <canvas ref={canvasRef} />;
 };
 
-export default HandWriter
+export default HandWriter;
