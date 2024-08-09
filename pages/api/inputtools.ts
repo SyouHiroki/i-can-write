@@ -1,29 +1,57 @@
 import type { NextApiRequest, NextApiResponse } from "next"
 
-type ResponseType = {
+type GoogleImeReqType = {
+  options: string
+  requests: {
+    writing_guide: {
+      writing_area_width: number
+      writing_area_height: number
+    }
+    ink: number[][][]
+    language: "zh-Hans" | "ja" | "en"
+  }[]
+}
+
+type GoogleImeResType = [
+  string,
+  [
+      string,
+      string[],
+      any[],
+      { is_html_escaped: boolean }
+  ]
+]
+
+export type InputtoolsResType = {
   code: number
   msg: string
   data: any
 }
 
+export type InputtoolsReqType = {
+  trace: number[][][]
+  lang: "zh-Hans" | "ja" | "en"
+  canvasWidth: number
+  canvasHeight: number
+}
+
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<ResponseType>,
+  res: NextApiResponse<InputtoolsResType>,
 ) {
   if (req.method !== 'POST') {
     res.status(405).json({ code: 405, msg: '请求方法不允许！', data: null })
     return
   }
 
-  const {trace, lang, canvasWidth, canvasHeight} = req.body
+  const {trace, lang, canvasWidth, canvasHeight} : InputtoolsReqType = req.body
 
   if (!trace || !lang || !canvasWidth || !canvasHeight) {
     res.status(500).json({ code: 500, msg: '一个或多个参数有误！', data: null })
     return
   }
 
-  let ret
-  const arg = {
+  const arg: GoogleImeReqType = {
     "options": "enable_pre_space",
     "requests": [
       {
@@ -38,7 +66,7 @@ export default async function handler(
   }
 
   try {
-    ret = await (await fetch('https://www.google.com.tw/inputtools/request?ime=handwriting&app=mobilesearch&cs=1&oe=UTF-8', {
+    const ret: GoogleImeResType = await (await fetch('https://www.google.com.tw/inputtools/request?ime=handwriting&app=mobilesearch&cs=1&oe=UTF-8', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
