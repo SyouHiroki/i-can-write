@@ -1,5 +1,5 @@
-import HandWriter from './HandWriter'
+import Handwriter from './Handwriter'
 
 export {
-  HandWriter
+  Handwriter
 }

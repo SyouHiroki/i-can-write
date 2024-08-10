@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { HandWriter } from "@/components"
+import { Handwriter } from "@/components"
 import { useWindowSize } from "@/hooks"
 import { recognize } from "@/handlers"
 
@@ -13,9 +13,9 @@ export default function Home() {
   }
 
   return (
-    <div className="w-screen h-screen" >
+    <div className="w-screen h-screen overflow-hidden" >
       <div className="flex flex-col items-center">
-        <HandWriter handler={handler} brushWidth={10} height={300} width={windowWidth - 50} debug />
+        <Handwriter handler={handler} brushWidth={10} height={300} width={windowWidth - 50} auxiliaryLine  />
         <div>{text?.map(item => ' ' + item + ' ')}</div>
       </div>
     </div>
