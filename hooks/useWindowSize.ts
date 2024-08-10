@@ -14,7 +14,6 @@ export const useWindowSize = () => {
             })
         }
 
-        //init
         handler()
 
         window.addEventListener('resize', handler)

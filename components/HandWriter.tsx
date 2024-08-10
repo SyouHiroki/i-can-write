@@ -44,8 +44,6 @@ export const HandWriter: React.FC<{
     pencilBrush.width = brushWidth || 10
     canvas.freeDrawingBrush = pencilBrush
 
-    
-
     canvas.on('path:created', (event) => {
       const path = event.path as fabric.Path;
       const pathData = path.path
@@ -104,7 +102,7 @@ export const HandWriter: React.FC<{
   }, [width, height, brushColor, brushWidth, resTime, handler, debug])
 
   return (
-    <div style={{height: height, width: width}} className={`${debug ? 'border border-solid border-black' : ''}`}>
+    <div style={{height: height, width: width}} className={`${debug ? 'border border-solid border-black overflow-hidden' : 'overflow-hidden'}`}>
       <canvas ref={canvasRef} />
     </div>
   )
