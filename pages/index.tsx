@@ -1,3 +1,4 @@
+import Head from 'next/head'
 import { useState } from "react"
 import { Handwriter } from "@/components"
 import { useWindowSize } from "@/hooks"
@@ -14,6 +15,7 @@ export default function Home() {
 
   return (
     <div className="w-screen h-screen overflow-hidden" >
+      <Head><title>Sayu - 早柚</title></Head>
       <div className="flex flex-col items-center">
         <Handwriter handler={handler} brushWidth={10} height={300} width={windowWidth - 50} auxiliaryLine />
         <div>{text?.map(item => ' ' + item + ' ')}</div>

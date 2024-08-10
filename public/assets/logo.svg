@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="_图层_2" data-name="图层 2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 263.85 263.85">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: #231815;
+      }
+
+      .cls-1, .cls-2 {
+        stroke-width: 0px;
+      }
+
+      .cls-3 {
+        stroke: #87c89c;
+      }
+
+      .cls-3, .cls-4, .cls-5 {
+        fill: none;
+        stroke-miterlimit: 10;
+        stroke-width: 12px;
+      }
+
+      .cls-3, .cls-5 {
+        stroke-linecap: round;
+      }
+
+      .cls-4, .cls-5 {
+        stroke: #231815;
+      }
+
+      .cls-2 {
+        fill: #676db2;
+      }
+    </style>
+  </defs>
+  <g id="_图层_1-2" data-name="图层 1">
+    <g>
+      <circle class="cls-4" cx="131.92" cy="131.92" r="125.92"/>
+      <line class="cls-5" x1="191.94" y1="61.99" x2="142.99" y2="110.95"/>
+      <line class="cls-3" x1="191.94" y1="110.95" x2="142.99" y2="61.99"/>
+      <circle class="cls-1" cx="95.99" cy="168.74" r="7.79"/>
+      <circle class="cls-1" cx="65.22" cy="175.28" r="7.79"/>
+      <circle class="cls-2" cx="88.21" cy="198.36" r="7.79"/>
+    </g>
+  </g>
+</svg>
