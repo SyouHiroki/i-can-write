@@ -7,13 +7,15 @@ export const HandWriter: React.FC<{
   brushColor?: string
   brushWidth?: number
   resTime?: number
-  handler?: (trace: number[][][]) => void
+  debug?: boolean
+  handler?: (trace: number[][][], canvasWidth?: number, canvasHeight?: number) => void
 }> = ({
   width,
   height,
   brushColor,
   brushWidth,
   resTime,
+  debug,
   handler,
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null)
@@ -26,6 +28,7 @@ export const HandWriter: React.FC<{
     const canvas = new fabric.Canvas(canvasRef.current)
     fabricCanvasRef.current = canvas
 
+    let trace: number[][][] = []
     const parent = canvasRef.current.parentElement?.parentElement
     const currWidth = width || parent?.clientWidth
     const currHeight = height || parent?.clientHeight
@@ -41,7 +44,7 @@ export const HandWriter: React.FC<{
     pencilBrush.width = brushWidth || 10
     canvas.freeDrawingBrush = pencilBrush
 
-    let trace: number[][][] = []
+    
 
     canvas.on('path:created', (event) => {
       const path = event.path as fabric.Path;
@@ -84,11 +87,12 @@ export const HandWriter: React.FC<{
         
         handler ? 
         (() => {
-          handler(trace)
+          debug && console.log('trace:', trace)
+          handler(trace, currWidth, currHeight)
           trace = []
         })() 
         :
-        console.log('Trace:', trace)
+        console.log('trace:', trace)
 
         canvas.clear()
       }, resTime || 500)
@@ -96,11 +100,15 @@ export const HandWriter: React.FC<{
 
     return () => {
       fabricCanvasRef.current?.dispose()
-    };
-  }, [width, height, brushColor, brushWidth, resTime, handler])
+    }
+  }, [width, height, brushColor, brushWidth, resTime, handler, debug])
 
-  return <canvas ref={canvasRef} />
-};
+  return (
+    <div style={{height: height, width: width}} className={`${debug ? 'border border-solid border-black' : ''}`}>
+      <canvas ref={canvasRef} />
+    </div>
+  )
+}
 
 export default HandWriter
 

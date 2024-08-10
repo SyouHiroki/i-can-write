@@ -1,16 +1,18 @@
 import HandWriter from "@/components/HandWriter"
 import { InputtoolsReqType, InputtoolsResType } from "./api/inputtools"
 import { useState } from "react"
+import useWindowSize from "@/hooks/useWindowSize"
 
 export default function Home() {
   const [text, setText] = useState<string[]>([])
+  const {width: windowWidth} = useWindowSize()
 
-  const handler = async (trace: number[][][]) => {
+  const handler = async (trace: number[][][], canvasWidth?: number, canvasHeight?: number) => {
     const arg: InputtoolsReqType = {
       trace: trace,
       lang: 'zh-Hans',
-      canvasHeight: 500,
-      canvasWidth: 700
+      canvasHeight: canvasWidth || 500,
+      canvasWidth: canvasHeight || 500
     }
 
     try {
@@ -29,11 +31,11 @@ export default function Home() {
   }
 
   return (
-    <div className="w-screen h-screen">
-      <div className="w-[700px] h-[500px] border border-solid border-black">
-        <HandWriter handler={handler} brushWidth={10}/>
+    <div className="w-screen h-screen" >
+      <div className="flex flex-col items-center">
+        <HandWriter handler={handler} brushWidth={10} height={300} width={windowWidth - 50} debug />
+        <div>{text.map(item => ' ' + item + ' ')}</div>
       </div>
-      <div>{text.map(item => ' ' + item + ' ')}</div>
     </div>
   )
 }
