@@ -15,7 +15,7 @@ export default function Home() {
   return (
     <div className="w-screen h-screen overflow-hidden" >
       <div className="flex flex-col items-center">
-        <Handwriter handler={handler} brushWidth={10} height={300} width={windowWidth - 50} auxiliaryLine  />
+        <Handwriter handler={handler} brushWidth={10} height={300} width={windowWidth - 50} auxiliaryLine />
         <div>{text?.map(item => ' ' + item + ' ')}</div>
       </div>
     </div>
