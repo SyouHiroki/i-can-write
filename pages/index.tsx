@@ -8,7 +8,7 @@ export default function Home() {
   const {width: windowWidth} = useWindowSize()
 
   const handler = async (trace: number[][][], canvasWidth?: number, canvasHeight?: number) => {
-    const data = await recognize(trace, canvasWidth, canvasHeight)
+    const data = await recognize(trace, canvasWidth, canvasHeight, 'zh-Hans')
     data && setText(data)
   }
 

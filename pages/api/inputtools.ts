@@ -1,3 +1,4 @@
+import { INPUTTOOLS_API, LANG } from "@/config"
 import type { NextApiRequest, NextApiResponse } from "next"
 
 type GoogleImeReq = {
@@ -8,7 +9,7 @@ type GoogleImeReq = {
       writing_area_height: number
     }
     ink: number[][][]
-    language: "zh-Hans" | "ja" | "en"
+    language: LANG
   }[]
 }
 
@@ -32,7 +33,7 @@ export type InputtoolsRes = {
 
 export type InputtoolsReq = {
   trace: number[][][]
-  lang: "zh-Hans" | "ja" | "en"
+  lang: LANG
   canvasWidth: number
   canvasHeight: number
 }
@@ -68,7 +69,7 @@ export default async function handler(
   }
 
   try {
-    const ret: GoogleImeRes = await (await fetch('https://www.google.com.tw/inputtools/request?ime=handwriting&app=mobilesearch&cs=1&oe=UTF-8', {
+    const ret: GoogleImeRes = await (await fetch(INPUTTOOLS_API, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'

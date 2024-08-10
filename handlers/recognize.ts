@@ -1,9 +1,10 @@
+import { LANG } from "@/config"
 import { InputtoolsReq, InputtoolsRes } from "@/pages/api/inputtools"
 
-export const recognize = async (trace: number[][][], canvasWidth?: number, canvasHeight?: number) => {
+export const recognize = async (trace: number[][][], canvasWidth?: number, canvasHeight?: number, lang?: LANG) => {
   const arg: InputtoolsReq = {
     trace: trace,
-    lang: 'zh-Hans',
+    lang: lang || 'zh-Hans',
     canvasHeight: canvasWidth || 500,
     canvasWidth: canvasHeight || 500
   }
