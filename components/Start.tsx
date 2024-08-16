@@ -16,8 +16,11 @@ export const Start: React.FC<{}> = () => {
         className="w-[35vw] h-[35vw]"
       />
 
-      <div className="text-[5vw]">Sayu🍊 - 日语边写边学</div>
-      <div className="text-[5vw]">⬅️左划以选择模式</div>
+      <div className="text-[5vw] flex flex-col justify-center items-center">
+        <div>Sayu🍊</div>
+        <div>日语单词📝边写边背</div>
+        <div className="mt-[10vw]">⬅️左划以选择模式</div>
+      </div>
     </div>
   )
 }

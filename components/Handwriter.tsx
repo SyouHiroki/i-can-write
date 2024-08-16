@@ -11,6 +11,7 @@ export const Handwriter: React.FC<{
   resTime?: number
   debug?: boolean
   auxiliaryLine?: boolean
+  currentChar?: string
   handler?: HandwriterHandler
 }> = props => {
   const isDrawing = useRef<boolean>(false)
@@ -55,6 +56,18 @@ export const Handwriter: React.FC<{
     pencilBrush.color = props.brushColor || 'black'
     pencilBrush.width = props.brushWidth || 10
     handwritingCanvas.freeDrawingBrush = pencilBrush
+
+    const textObj = new fabric.FabricText(props.currentChar || '', {
+      fill: '#7c7c7c',
+      fontSize: currWidth * 0.5,
+      selectable: false,
+      originX: 'center',
+      originY: 'center',
+      left: currWidth / 2,
+      top: currHeight / 2,
+    })
+    
+    handwritingCanvas.add(textObj)
 
     // drawDashedLine(0, 0, currWidth, currHeight, bgCanvas)
     // drawDashedLine(currWidth, 0, 0, currHeight, bgCanvas)
