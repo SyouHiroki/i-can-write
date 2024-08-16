@@ -1,6 +1,8 @@
 import * as fabric from 'fabric'
 import React, { useEffect, useRef } from 'react'
 
+export type HandwriterHandler = (trace: number[][][], canvasWidth?: number, canvasHeight?: number) => void
+
 export const Handwriter: React.FC<{
   width?: number
   height?: number
@@ -9,24 +11,16 @@ export const Handwriter: React.FC<{
   resTime?: number
   debug?: boolean
   auxiliaryLine?: boolean
-  handler?: (trace: number[][][], canvasWidth?: number, canvasHeight?: number) => void
-}> = ({
-  width,
-  height,
-  brushColor,
-  brushWidth,
-  resTime,
-  debug,
-  auxiliaryLine,
-  handler,
-}) => {
+  handler?: HandwriterHandler
+}> = props => {
+  const isDrawing = useRef<boolean>(false)
   const handwritingCanvasRef = useRef<HTMLCanvasElement>(null)
   const bgCanvasRef = useRef<HTMLCanvasElement>(null)
   const timer = useRef<NodeJS.Timeout>()
 
   const drawDashedLine = (x1: number, y1: number, x2: number, y2: number, canvas: fabric.Canvas) => {
     const line = new fabric.Line([x1, y1, x2, y2], {
-      stroke: 'gray',
+      stroke: '#7c7c7c',
       strokeWidth: 1,
       strokeDashArray: [5, 5], 
       selectable: false 
@@ -40,9 +34,11 @@ export const Handwriter: React.FC<{
     const handwritingCanvas = new fabric.Canvas(handwritingCanvasRef.current)
     const bgCanvas = new fabric.Canvas(bgCanvasRef.current)
     let trace: number[][][] = []
+    let currentStroke: number[][] = [[], []]
+
     const parent = handwritingCanvasRef.current.parentElement?.parentElement
-    const currWidth = width || parent?.clientWidth || 500
-    const currHeight = height || parent?.clientHeight || 500
+    const currWidth = props.width || parent?.clientWidth || 500
+    const currHeight = props.height || parent?.clientHeight || 500
 
     handwritingCanvas.setDimensions({
       width: currWidth,
@@ -56,8 +52,8 @@ export const Handwriter: React.FC<{
 
     handwritingCanvas.isDrawingMode = true
     const pencilBrush = new fabric.PencilBrush(handwritingCanvas)
-    pencilBrush.color = brushColor || 'black'
-    pencilBrush.width = brushWidth || 10
+    pencilBrush.color = props.brushColor || 'black'
+    pencilBrush.width = props.brushWidth || 10
     handwritingCanvas.freeDrawingBrush = pencilBrush
 
     // drawDashedLine(0, 0, currWidth, currHeight, bgCanvas)
@@ -68,71 +64,55 @@ export const Handwriter: React.FC<{
     drawDashedLine(currWidth - currWidth * 0.95, currHeight / 2, currWidth * 0.95, currHeight / 2, bgCanvas)
     drawDashedLine(currWidth / 2, currHeight - currHeight * 0.95, currWidth / 2, currHeight * 0.95, bgCanvas)
 
-    handwritingCanvas.on('path:created', (event) => {
-      const path = event.path as fabric.Path;
-      const pathData = path.path
-
-      const xCoords: number[] = []
-      const yCoords: number[] = []
-
-      pathData.forEach((item) => {
-        if (item.length >= 3) {
-          const [cmd, x, y] = item as [string, number, number]
-          if (cmd === 'M' || cmd === 'L') {
-            xCoords.push(x)
-            yCoords.push(y)
-          }
-        }
-      })
-
-      trace.push([xCoords, yCoords])
-    })
-
     handwritingCanvas.on('mouse:down', () => {
       clearTimeout(timer.current)
+      isDrawing.current = true
+      currentStroke = [[], []]
     })
 
     handwritingCanvas.on('mouse:move', (event) => {
-      const pointer = fabric.util.getPointer(event.e)
+      if (!isDrawing) return
+
+      const pointer = handwritingCanvas.getPointer(event.e)
       const x = pointer.x
       const y = pointer.y
 
-      if (trace.length > 0) {
-        const lastTrace = trace[trace.length - 1]
-        lastTrace[0].push(x)
-        lastTrace[1].push(y)
-      }
+      currentStroke[0].push(x)
+      currentStroke[1].push(y)
     })
 
     handwritingCanvas.on('mouse:up', () => {
+      isDrawing.current = false
+      trace.push(currentStroke)
+
       timer.current = setTimeout(() => {
-        
-        handler ? 
+        props.handler ? 
         (() => {
-          debug && console.log('trace:', trace)
-          handler(trace, currWidth, currHeight)
+          props.debug && console.log('trace:', trace)
+          props.handler(trace, currWidth, currHeight)
           trace = []
         })() 
         :
         console.log('trace:', trace)
 
+        trace = []
         handwritingCanvas.clear()
-      }, resTime || 500)
+      }, props.resTime || 500)
     })
 
     return () => {
       handwritingCanvas.dispose()
       bgCanvas.dispose()
     }
-  }, [width, height, brushColor, brushWidth, resTime, handler, debug])
+  }, [props])
 
   return (
-    <div style={{height: height, width: width, overflow: 'hidden', position: 'relative'}} className='bg-[#f9f9f9]'>
-      <div style={{height: height, width: width, visibility: auxiliaryLine ? 'visible' : 'hidden'}} className='pointer-events-none absolute top-0 left-0'>
+    <div style={{height: props.height, width: props.width, overflow: 'hidden', position: 'relative'}} className='bg-[#f9f9f9]'>
+      <div style={{height: props.height, width: props.width, visibility: props.auxiliaryLine ? 'visible' : 'hidden'}} className='pointer-events-none absolute top-0 left-0'>
         <canvas ref={bgCanvasRef} className='pointer-events-none'/>
       </div>
 
-      <div style={{height: height, width: width}}>
+      <div style={{height: props.height, width: props.width}}>
         <canvas ref={handwritingCanvasRef} />
       </div>
     </div>
@@ -140,4 +120,3 @@ export const Handwriter: React.FC<{
 }
 
 export default Handwriter
-
