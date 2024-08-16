@@ -71,9 +71,9 @@ export const Handwriter: React.FC<{
     })
 
     handwritingCanvas.on('mouse:move', (event) => {
-      if (!isDrawing) return
+      if (!isDrawing.current) return
 
-      const pointer = handwritingCanvas.getPointer(event.e)
+      const pointer = fabric.util.getPointer(event.e)
       const x = pointer.x
       const y = pointer.y
 
