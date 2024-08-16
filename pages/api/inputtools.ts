@@ -9,7 +9,7 @@ type GoogleImeReq = {
       writing_area_height: number
     }
     ink: number[][][]
-    language: LANG
+    language: typeof LANG
   }[]
 }
 
@@ -33,7 +33,7 @@ export type InputtoolsRes = {
 
 export type InputtoolsReq = {
   trace: number[][][]
-  lang: LANG
+  lang: typeof LANG
   canvasWidth: number
   canvasHeight: number
 }
