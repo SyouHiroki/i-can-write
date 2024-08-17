@@ -8,6 +8,7 @@ export const Stage: React.FC<{
   data: typeof STAGE_LIST[0]
   promptIsShow?: boolean
   orientation: Orientation
+  currentWordSplit?: string
   promptIsShowHandler?: () => void
 }> = props => {
 
@@ -21,7 +22,10 @@ export const Stage: React.FC<{
             <div className={`w-full h-full ${props.current !== item.id ? 'pointer-events-none' : ''}`}>
               <div className="w-full flex flex-col justify-center" style={{height: props.contentHeight ? `${props.contentHeight}px` : '100%'}}>
                 <div className="flex flex-col justify-start" style={props.orientation === 'portrait' ? {padding: '5vw', gap: '8vw'} : {padding: '5vh', gap: '8vh'}}>
-                  <div className="font-semibold" style={props.orientation === 'portrait' ? {fontSize: '12vw'} : {fontSize: '12vh'}}>{item.word}</div>
+                  <div>
+                    <div className="font-semibold" style={props.orientation === 'portrait' ? {fontSize: '12vw'} : {fontSize: '12vh'}}>{item.word}</div>
+                    <div className={`${props.currentWordSplit ? 'text-black' : 'text-transparent'}`} style={props.orientation === 'portrait' ? {fontSize: '4vw'} : {fontSize: '4vh'}}>{props.currentWordSplit || 'none'}</div>
+                  </div>
                   <div style={props.orientation === 'portrait' ? {fontSize: '4.5vw'} : {fontSize: '4.5vh'}}>{item.desc}</div>
                   <button 
                     className="rounded-md cursor-pointer"
