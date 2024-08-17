@@ -13,6 +13,7 @@ export const Stage: React.FC<{
   handwriterIsClose?: boolean
   drawerContentHeight?: number
   currentChar?: string
+  handwriterResTime?: number
   debug?: boolean
   promptIsShowHandler?: () => void
   handwriterIsCloseHandler?: () => void
@@ -55,6 +56,7 @@ export const Stage: React.FC<{
         orientation={props.orientation}
       >
         <Handwriter
+          orientation={props.orientation}
           handler={props.handwriterHandler}
           brushWidth={10}
           height={props.drawerContentHeight}
@@ -62,6 +64,7 @@ export const Stage: React.FC<{
           auxiliaryLine
           currentChar={props.currentChar}
           promptIsShow={props.promptIsShow}
+          resTime={props.handwriterResTime}
           debug={props.debug}
         /> 
       </Drawer>

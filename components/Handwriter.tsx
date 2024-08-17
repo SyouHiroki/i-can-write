@@ -1,7 +1,8 @@
+import { Orientation } from '@/hooks'
 import * as fabric from 'fabric'
-import React, { useCallback, useEffect, useRef } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 
-export type HandwriterHandler = (trace: number[][][], canvasWidth?: number, canvasHeight?: number) => void
+export type HandwriterHandler = (trace: number[][][], canvasWidth?: number, canvasHeight?: number) => Promise<void>
 
 export const Handwriter: React.FC<{
   width?: number
@@ -13,12 +14,14 @@ export const Handwriter: React.FC<{
   auxiliaryLine?: boolean
   currentChar?: string
   promptIsShow?: boolean
+  orientation: Orientation
   handler?: HandwriterHandler
 }> = props => {
   const isDrawing = useRef<boolean>(false)
   const handwritingCanvasRef = useRef<HTMLCanvasElement>(null)
   const bgCanvasRef = useRef<HTMLCanvasElement>(null)
   const timer = useRef<NodeJS.Timeout>()
+  const mutex = useRef<boolean>(false)
 
   const drawDashedLine = useCallback((x1: number, y1: number, x2: number, y2: number, canvas: fabric.Canvas) => {
     const line = new fabric.Line([x1, y1, x2, y2], {
@@ -67,7 +70,7 @@ export const Handwriter: React.FC<{
     if (props.promptIsShow) {
       const textObj = new fabric.FabricText(props.currentChar || '', {
         fill: '#7c7c7c',
-        fontSize: currWidth * 0.5,
+        fontSize: props.orientation === 'portrait' ? currWidth * 0.5 : currHeight * 0.5,
         selectable: false,
         originX: 'center',
         originY: 'center',
@@ -78,16 +81,12 @@ export const Handwriter: React.FC<{
       handwritingCanvas.add(textObj)
     }
 
-    // drawDashedLine(0, 0, currWidth, currHeight, bgCanvas)
-    // drawDashedLine(currWidth, 0, 0, currHeight, bgCanvas)
-    // drawDashedLine(0, currHeight / 2, currWidth, currHeight / 2, bgCanvas)
-    // drawDashedLine(currWidth / 2, 0, currWidth / 2, currHeight, bgCanvas)
-
     drawDashedLine(currWidth - currWidth * 0.95, currHeight / 2, currWidth * 0.95, currHeight / 2, bgCanvas)
     drawDashedLine(currWidth / 2, currHeight - currHeight * 0.95, currWidth / 2, currHeight * 0.95, bgCanvas)
 
     handwritingCanvas.on('mouse:down', () => {
       clearTimeout(timer.current)
+      mutex.current = false
       isDrawing.current = true
       currentStroke = [[], []]
     })
@@ -107,21 +106,22 @@ export const Handwriter: React.FC<{
       isDrawing.current = false
       trace.push(currentStroke)
 
-      if (!arrayIsEmpty(trace)) {
-        timer.current = setTimeout(() => {
-          props.handler ? 
-          (() => {
-            props.debug && console.log('trace:', trace)
-            props.handler(trace, currWidth, currHeight)
-            trace = []
-          })() 
-          :
-          console.log('trace:', trace)
-  
-          trace = []
-          handwritingCanvas.clear()
-        }, props.resTime || 500)
+      if (arrayIsEmpty(trace)) return
+      props.debug && console.log('trace:', trace)
+
+      if (mutex.current) {
+        trace = []
+        handwritingCanvas.clear()
+        return
       }
+
+      mutex.current = true
+      timer.current = setTimeout(async () => {
+        props.handler && await props.handler(trace, currWidth, currHeight)
+        trace = []
+        handwritingCanvas.clear()
+        mutex.current = false
+      }, props.resTime || 500)
     })
 
     return () => {

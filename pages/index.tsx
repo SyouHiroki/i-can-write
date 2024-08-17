@@ -1,12 +1,12 @@
 import Head from 'next/head'
-import { useCallback, useState } from "react"
+import { useCallback, useRef, useState } from "react"
 import { useWindowInfo } from "@/hooks"
 import { recognize } from "@/handlers"
 import { Clear, Launch, Stage } from '@/views'
 import { LANG, MODE_LIST, STAGE_LIST } from '@/config'
 
 export default function Home() {
-  const debug = false
+  const debug = useRef<boolean>(false)
   const [mode, setMode] = useState<number>(0)
   const [process, setProcess] = useState<number>(0)
   const [handwriterRecognized, setHandwriterRecognized] = useState<string[]>([])
@@ -84,15 +84,17 @@ export default function Home() {
           drawerContentHeight={windowInfo.height * 0.4}
           currentChar={STAGE_LIST[mode][currentStage].write[currentCharIndex]}
           handwriterHandler={handwriterHandler}
-          debug={debug}
+          debug={debug.current}
         />
       }
 
       {process === 2 &&
-        <Clear />
+        <Clear
+          orientation={windowInfo.orientation}
+        />
       }
 
-      {debug && //debug info
+      {debug.current && //debug info
         <div className='absolute top-0 right-0 z-[999999] p-[2vw] bg-[rgba(0,0,0,.5)]'>
           debug:
           <div>process: {process}</div>
