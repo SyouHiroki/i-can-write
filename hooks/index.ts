@@ -1,5 +1,9 @@
-import useWindowSize from './useWindowSize'
+import {useWindowInfo, Orientation} from './useWindowInfo'
 
 export {
-  useWindowSize
+  useWindowInfo
+}
+
+export type {
+  Orientation
 }

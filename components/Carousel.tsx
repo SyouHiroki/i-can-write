@@ -10,8 +10,8 @@ export const Carousel: React.FC<{
   const [carouselState, setCarouselState] = useState<ICarouselState>()
 
   const bearSlideItemData: TBearSlideItemDataList = props.data.map(item => (
-    <BearSlideCard key={item.id}>
-        {item.render}
+    <BearSlideCard key={item.id} className='cursor-default'>
+      {item.render}
     </BearSlideCard>
   ))
 

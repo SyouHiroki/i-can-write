@@ -1,13 +1,13 @@
 import Head from 'next/head'
 import { useCallback, useState } from "react"
-import { useWindowSize } from "@/hooks"
+import { useWindowInfo } from "@/hooks"
 import { recognize } from "@/handlers"
 import { Launch, Stage } from '@/views'
 import { LANG, MODE_LIST, STAGE_LIST } from '@/config'
 import { Drawer, Handwriter } from '@/components'
 
 export default function Home() {
-  const debug = true
+  const debug = false
   const [mode, setMode] = useState<number>(0)
   const [process, setProcess] = useState<number>(0)
   const [handwriterRecognized, setHandwriterRecognized] = useState<string[]>([])
@@ -15,7 +15,7 @@ export default function Home() {
   const [currentStage, setCurrentStage] = useState<number>(0)
   const [currentCharIndex, setCurrentCharIndex] = useState<number>(0)
   const [promptIsShow, setPromptIsShow] = useState<boolean>(false) 
-  const windowSize = useWindowSize()
+  const windowInfo = useWindowInfo()
 
   const modeSetHandler = useCallback((mode: number) => {
     setMode(mode)
@@ -40,6 +40,7 @@ export default function Home() {
     } else {
       if (currentStage + 1 <= STAGE_LIST[mode].length - 1) {
         setCurrentCharIndex(0)
+        setPromptIsShow(false)
         setCurrentStage(preState => preState + 1)
       } else {
         setProcess(2)
@@ -51,7 +52,7 @@ export default function Home() {
     setPromptIsShow(preState => !preState)
   }, [])
 
-  return (
+  return windowInfo.ready && (
     <div className="w-screen h-screen overflow-hidden" >
       <Head><title>Sayu - 早柚</title></Head>
 
@@ -66,21 +67,22 @@ export default function Home() {
         <>
           <Stage
             current={currentStage}
-            contentHeight={windowSize.height * 0.6}
+            contentHeight={windowInfo.height * 0.6}
             data={STAGE_LIST[mode]}
+            promptIsShow={promptIsShow}
             promptIsShowHandler={promptIsShowHandler}
           />
 
           <Drawer
             toggleHandler={handwriterIsCloseHandler}
             isClose={handwriterIsClose}
-            contentHeight={windowSize.height * 0.4}
+            contentHeight={windowInfo.height * 0.4}
           >
             <Handwriter
               handler={handwriterHandler}
               brushWidth={10}
-              height={windowSize.height * 0.4}
-              width={windowSize.width}
+              height={windowInfo.height * 0.4}
+              width={windowInfo.width}
               auxiliaryLine
               currentChar={STAGE_LIST[mode][currentStage].write[currentCharIndex]}
               promptIsShow={promptIsShow}

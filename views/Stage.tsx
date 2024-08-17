@@ -5,6 +5,7 @@ export const Stage: React.FC<{
   current: number
   contentHeight?: number
   data: typeof STAGE_LIST[0]
+  promptIsShow?: boolean
   promptIsShowHandler?: () => void
 }> = props => {
 
@@ -15,11 +16,13 @@ export const Stage: React.FC<{
         data={props.data.map(item => ({
           id: item.id,
           render: (
-            <div className="w-full" style={{height: props.contentHeight ? `${props.contentHeight}px` : '100%'}}>
-              <div className="flex flex-col">
-                <div>{item.word}</div>
-                <div>{item.desc}</div>
-                <button onClick={props.promptIsShowHandler}>提示</button>
+            <div className={`w-full h-full ${props.current !== item.id ? 'pointer-events-none' : ''}`}>
+              <div className="w-full" style={{height: props.contentHeight ? `${props.contentHeight}px` : '100%'}}>
+                <div className="flex flex-col p-[5vw] gap-[8vw] justify-start">
+                  <div className="text-[12vw] font-semibold">{item.word}</div>
+                  <div className="text-[4.5vw]">{item.desc}</div>
+                  <button className="border-[.4vw] text-[4vw] border-dashed border-black rounded-md p-[2vw] cursor-pointer" onClick={props.promptIsShowHandler}>{props.promptIsShow ? '关闭提示' : '提示'}</button>
+                </div>
               </div>
             </div>
           )
