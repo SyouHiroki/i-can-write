@@ -2,9 +2,8 @@ import Head from 'next/head'
 import { useCallback, useState } from "react"
 import { useWindowInfo } from "@/hooks"
 import { recognize } from "@/handlers"
-import { Launch, Stage } from '@/views'
+import { Clear, Launch, Stage } from '@/views'
 import { LANG, MODE_LIST, STAGE_LIST } from '@/config'
-import { Drawer, Handwriter } from '@/components'
 
 export default function Home() {
   const debug = false
@@ -71,35 +70,26 @@ export default function Home() {
       }
 
       {process === 1 &&
-        <>
-          <Stage
-            current={currentStage}
-            contentHeight={windowInfo.height * 0.6}
-            data={STAGE_LIST[mode]}
-            promptIsShow={promptIsShow}
-            promptIsShowHandler={promptIsShowHandler}
-            orientation={windowInfo.orientation}
-            currentWordSplit={currentWordSplit}
-          />
+        <Stage
+          currentStage={currentStage}
+          contentHeight={windowInfo.height * 0.6}
+          contentWidth={windowInfo.width}
+          data={STAGE_LIST[mode]}
+          promptIsShow={promptIsShow}
+          promptIsShowHandler={promptIsShowHandler}
+          orientation={windowInfo.orientation}
+          currentWordSplit={currentWordSplit}
+          handwriterIsClose={handwriterIsClose}
+          handwriterIsCloseHandler={handwriterIsCloseHandler}
+          drawerContentHeight={windowInfo.height * 0.4}
+          currentChar={STAGE_LIST[mode][currentStage].write[currentCharIndex]}
+          handwriterHandler={handwriterHandler}
+          debug={debug}
+        />
+      }
 
-          <Drawer
-            toggleHandler={handwriterIsCloseHandler}
-            isClose={handwriterIsClose}
-            contentHeight={windowInfo.height * 0.4}
-            orientation={windowInfo.orientation}
-          >
-            <Handwriter
-              handler={handwriterHandler}
-              brushWidth={10}
-              height={windowInfo.height * 0.4}
-              width={windowInfo.width}
-              auxiliaryLine
-              currentChar={STAGE_LIST[mode][currentStage].write[currentCharIndex]}
-              promptIsShow={promptIsShow}
-              debug={debug}
-            /> 
-          </Drawer>
-        </>
+      {process === 2 &&
+        <Clear />
       }
 
       {debug && //debug info
@@ -113,6 +103,7 @@ export default function Home() {
           <div>currentChar: {STAGE_LIST[mode][currentStage].write[currentCharIndex]}</div>
           <div>currentWordSplit: {currentWordSplit}</div>
           <div>currentStage: {currentStage}</div>
+          <button onClick={() => process ? setProcess(0) : setProcess(1)}>switch</button>
         </div>
       }
 
