@@ -5,6 +5,7 @@ export const Stage: React.FC<{
   current: number
   contentHeight?: number
   data: typeof STAGE_LIST[0]
+  promptIsShowHandler?: () => void
 }> = props => {
 
   return (
@@ -18,6 +19,7 @@ export const Stage: React.FC<{
               <div className="flex flex-col">
                 <div>{item.word}</div>
                 <div>{item.desc}</div>
+                <button onClick={props.promptIsShowHandler}>提示</button>
               </div>
             </div>
           )

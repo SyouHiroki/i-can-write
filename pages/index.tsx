@@ -7,13 +7,14 @@ import { LANG, MODE_LIST, STAGE_LIST } from '@/config'
 import { Drawer, Handwriter } from '@/components'
 
 export default function Home() {
-  const debug = false
+  const debug = true
   const [mode, setMode] = useState<number>(0)
   const [process, setProcess] = useState<number>(0)
   const [handwriterRecognized, setHandwriterRecognized] = useState<string[]>([])
   const [handwriterIsClose, setHandwriterIsClose] = useState<boolean>(false)
   const [currentStage, setCurrentStage] = useState<number>(0)
   const [currentCharIndex, setCurrentCharIndex] = useState<number>(0)
+  const [promptIsShow, setPromptIsShow] = useState<boolean>(false) 
   const windowSize = useWindowSize()
 
   const modeSetHandler = useCallback((mode: number) => {
@@ -46,6 +47,10 @@ export default function Home() {
     }
   }, [currentCharIndex, currentStage, mode])
 
+  const promptIsShowHandler = useCallback(() => {
+    setPromptIsShow(preState => !preState)
+  }, [])
+
   return (
     <div className="w-screen h-screen overflow-hidden" >
       <Head><title>Sayu - 早柚</title></Head>
@@ -63,6 +68,7 @@ export default function Home() {
             current={currentStage}
             contentHeight={windowSize.height * 0.6}
             data={STAGE_LIST[mode]}
+            promptIsShowHandler={promptIsShowHandler}
           />
 
           <Drawer
@@ -77,6 +83,7 @@ export default function Home() {
               width={windowSize.width}
               auxiliaryLine
               currentChar={STAGE_LIST[mode][currentStage].write[currentCharIndex]}
+              promptIsShow={promptIsShow}
               debug={debug}
             /> 
           </Drawer>
@@ -90,6 +97,7 @@ export default function Home() {
           <div>mode: {mode}</div>
           <div>handwriterRecognized: {handwriterRecognized?.map(item => ' ' + item + ' ')}</div>
           <div>handwriterIsClose: {handwriterIsClose ? 'true' : 'false'}</div>
+          <div>promptIsShow: {promptIsShow ? 'true' : 'false'}</div>
           <div>currentChar: {STAGE_LIST[mode][currentStage].write[currentCharIndex]}</div>
           <div>currentStage: {currentStage}</div>
           <button onClick={() => process ? setProcess(0) : setProcess(1)}>switch</button>

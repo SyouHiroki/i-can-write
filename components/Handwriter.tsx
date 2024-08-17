@@ -1,5 +1,5 @@
 import * as fabric from 'fabric'
-import React, { useEffect, useRef } from 'react'
+import React, { useCallback, useEffect, useRef } from 'react'
 
 export type HandwriterHandler = (trace: number[][][], canvasWidth?: number, canvasHeight?: number) => void
 
@@ -12,6 +12,7 @@ export const Handwriter: React.FC<{
   debug?: boolean
   auxiliaryLine?: boolean
   currentChar?: string
+  promptIsShow?: boolean
   handler?: HandwriterHandler
 }> = props => {
   const isDrawing = useRef<boolean>(false)
@@ -19,7 +20,7 @@ export const Handwriter: React.FC<{
   const bgCanvasRef = useRef<HTMLCanvasElement>(null)
   const timer = useRef<NodeJS.Timeout>()
 
-  const drawDashedLine = (x1: number, y1: number, x2: number, y2: number, canvas: fabric.Canvas) => {
+  const drawDashedLine = useCallback((x1: number, y1: number, x2: number, y2: number, canvas: fabric.Canvas) => {
     const line = new fabric.Line([x1, y1, x2, y2], {
       stroke: '#7c7c7c',
       strokeWidth: 1,
@@ -27,7 +28,13 @@ export const Handwriter: React.FC<{
       selectable: false 
     })
     canvas.add(line)
-  }
+  }, [])
+
+  const arrayIsEmpty = useCallback((arr: any[]): boolean => {
+    return arr.every(item => 
+      Array.isArray(item) ? arrayIsEmpty(item) : false
+    )
+  }, [])
 
   useEffect(() => {
     if (!handwritingCanvasRef.current || !bgCanvasRef.current) return
@@ -57,17 +64,19 @@ export const Handwriter: React.FC<{
     pencilBrush.width = props.brushWidth || 10
     handwritingCanvas.freeDrawingBrush = pencilBrush
 
-    const textObj = new fabric.FabricText(props.currentChar || '', {
-      fill: '#7c7c7c',
-      fontSize: currWidth * 0.5,
-      selectable: false,
-      originX: 'center',
-      originY: 'center',
-      left: currWidth / 2,
-      top: currHeight / 2,
-    })
-    
-    handwritingCanvas.add(textObj)
+    if (props.promptIsShow) {
+      const textObj = new fabric.FabricText(props.currentChar || '', {
+        fill: '#7c7c7c',
+        fontSize: currWidth * 0.5,
+        selectable: false,
+        originX: 'center',
+        originY: 'center',
+        left: currWidth / 2,
+        top: currHeight / 2,
+      })
+      
+      handwritingCanvas.add(textObj)
+    }
 
     // drawDashedLine(0, 0, currWidth, currHeight, bgCanvas)
     // drawDashedLine(currWidth, 0, 0, currHeight, bgCanvas)
@@ -98,26 +107,28 @@ export const Handwriter: React.FC<{
       isDrawing.current = false
       trace.push(currentStroke)
 
-      timer.current = setTimeout(() => {
-        props.handler ? 
-        (() => {
-          props.debug && console.log('trace:', trace)
-          props.handler(trace, currWidth, currHeight)
+      if (!arrayIsEmpty(trace)) {
+        timer.current = setTimeout(() => {
+          props.handler ? 
+          (() => {
+            props.debug && console.log('trace:', trace)
+            props.handler(trace, currWidth, currHeight)
+            trace = []
+          })() 
+          :
+          console.log('trace:', trace)
+  
           trace = []
-        })() 
-        :
-        console.log('trace:', trace)
-
-        trace = []
-        handwritingCanvas.clear()
-      }, props.resTime || 500)
+          handwritingCanvas.clear()
+        }, props.resTime || 500)
+      }
     })
 
     return () => {
       handwritingCanvas.dispose()
       bgCanvas.dispose()
     }
-  }, [props])
+  }, [props, drawDashedLine, arrayIsEmpty])
 
   return (
     <div style={{height: props.height, width: props.width, overflow: 'hidden', position: 'relative'}} className='bg-[#f9f9f9]'>

@@ -6,14 +6,10 @@ export const Drawer: React.FC<{
 }> = props => {
 
   return (
-    <div className="absolute bottom-0 z-[9999]">
-      <div
-        className="relative duration-500"
-        style={{height: props.isClose ? 0 : `${props.contentHeight}px`}}
-        onClick={props.toggleHandler}
-      >
-        {props.children}
-        <div className="absolute top-0 right-0 -translate-y-full bg-[#f9f9f9] w-[10vw] h-[8vw] flex justify-center items-center rounded-tl-md">
+    <div className="absolute bottom-0 z-[9999] overflow-hidden">
+
+      <div className="flex justify-end">
+        <div className="bg-[#f9f9f9] w-[10vw] h-[8vw] flex justify-center items-center rounded-tl-md" onClick={props.toggleHandler}>
           <div
             className={`w-0 h-0 border-solid border-l-[2vw] border-r-[2vw] border-l-transparent border-r-transparent ${props.isClose ?
               'border-b-[2vw] border-b-[#7c7c7c]' :
@@ -24,6 +20,14 @@ export const Drawer: React.FC<{
           </div>
         </div>
       </div>
+
+      <div
+        className="duration-500"
+        style={{height: props.isClose ? 0 : `${props.contentHeight}px`}}
+      >
+        {props.children}
+      </div>
+
     </div>
   )
 }
