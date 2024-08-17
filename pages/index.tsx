@@ -18,12 +18,14 @@ export default function Home() {
   const windowInfo = useWindowInfo()
 
   const modeSetHandler = useCallback((mode: number) => {
-    setMode(mode)
-    setProcess(1)
     setHandwriterRecognized([])
     setHandwriterIsClose(false)
     setCurrentStage(0)
     setCurrentCharIndex(0)
+    setCurrentWordSplit('')
+    setPromptIsShow(false)
+    setMode(mode)
+    setProcess(1)
   }, [])
 
   const handwriterIsCloseHandler = useCallback(() => {
@@ -46,7 +48,7 @@ export default function Home() {
           setCurrentCharIndex(0)
           setCurrentWordSplit('')
           setCurrentStage(preState => preState + 1)
-        }, 1500)
+        }, 1000)
       } else {
         setProcess(2)
       }
@@ -55,6 +57,27 @@ export default function Home() {
 
   const promptIsShowHandler = useCallback(() => {
     setPromptIsShow(preState => !preState)
+  }, [])
+
+  const resetHandler = useCallback(() => {
+    setMode(0)
+    setProcess(0)
+    setHandwriterRecognized([])
+    setHandwriterIsClose(false)
+    setCurrentStage(0)
+    setCurrentCharIndex(0)
+    setCurrentWordSplit('')
+    setPromptIsShow(false)
+  }, [])
+
+  const replayHandler = useCallback(() => {
+    setHandwriterRecognized([])
+    setHandwriterIsClose(false)
+    setCurrentStage(0)
+    setCurrentCharIndex(0)
+    setCurrentWordSplit('')
+    setPromptIsShow(false)
+    setProcess(1)
   }, [])
 
   return windowInfo.ready && (
@@ -84,6 +107,7 @@ export default function Home() {
           drawerContentHeight={windowInfo.height * 0.4}
           currentChar={STAGE_LIST[mode][currentStage].write[currentCharIndex]}
           handwriterHandler={handwriterHandler}
+          handwriterResTime={500}
           debug={debug.current}
         />
       }
@@ -91,6 +115,8 @@ export default function Home() {
       {process === 2 &&
         <Clear
           orientation={windowInfo.orientation}
+          exitHandler={resetHandler}
+          replayHandler={replayHandler}
         />
       }
 
