@@ -60,6 +60,7 @@ export default function Home() {
         <Launch
           modeList={MODE_LIST}
           modeSetHandler={modeSetHandler}
+          orientation={windowInfo.orientation}
         />
       }
 
@@ -71,12 +72,14 @@ export default function Home() {
             data={STAGE_LIST[mode]}
             promptIsShow={promptIsShow}
             promptIsShowHandler={promptIsShowHandler}
+            orientation={windowInfo.orientation}
           />
 
           <Drawer
             toggleHandler={handwriterIsCloseHandler}
             isClose={handwriterIsClose}
             contentHeight={windowInfo.height * 0.4}
+            orientation={windowInfo.orientation}
           >
             <Handwriter
               handler={handwriterHandler}
@@ -93,7 +96,7 @@ export default function Home() {
       }
 
       {debug && //debug info
-        <div className='absolute top-0 right-0 z-[99999] p-[2vw] bg-[rgba(0,0,0,.5)]'>
+        <div className='absolute top-0 right-0 z-[999999] p-[2vw] bg-[rgba(0,0,0,.5)]'>
           debug:
           <div>process: {process}</div>
           <div>mode: {mode}</div>
